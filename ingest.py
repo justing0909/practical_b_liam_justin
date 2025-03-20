@@ -5,7 +5,7 @@ import redis
 import numpy as np
 from redis.commands.search.query import Query
 import os
-import fitz
+import pymupdf
 
 # Initialize Redis connection
 redis_client = redis.Redis(host="localhost", port=6379, db=0)
@@ -67,7 +67,7 @@ def store_embedding(file: str, page: str, chunk: str, embedding: list):
 # extract the text from a PDF by page
 def extract_text_from_pdf(pdf_path):
     """Extract text from a PDF file."""
-    doc = fitz.open(pdf_path)
+    doc = pymupdf.open(pdf_path)
     text_by_page = []
     for page_num, page in enumerate(doc):
         text_by_page.append((page_num, page.get_text()))
