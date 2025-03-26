@@ -6,6 +6,7 @@ import numpy as np
 from redis.commands.search.query import Query
 import os
 import pymupdf
+import time
 
 # Initialize Redis connection
 redis_client = redis.Redis(host="localhost", port=6379, db=0)
@@ -128,10 +129,14 @@ def query_redis(query_text: str):
 
 def main():
     clear_redis_store()
-    create_hnsw_index()
 
+    start_time = time.perf_counter()
+    create_hnsw_index()
     process_pdfs("PDFs")
+    end_time = time.perf_counter()
+
     print("\n---Done processing PDFs---\n")
+    print(f"TIME TO RUN: {(end_time - start_time):.4f} seconds")
     query_redis("What is the capital of France?")
 
 
