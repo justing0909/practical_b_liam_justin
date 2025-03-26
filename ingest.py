@@ -7,6 +7,7 @@ from redis.commands.search.query import Query
 import os
 import pymupdf
 import time
+import psutil
 
 # Initialize Redis connection
 redis_client = redis.Redis(host="localhost", port=6379, db=0)
@@ -126,6 +127,28 @@ def query_redis(query_text: str):
     for doc in res.docs:
         print(f"{doc.id} \n ----> {doc.vector_distance}\n")
 
+# inner psutil function
+def process_memory():
+    process = psutil.Process(os.getpid())
+    mem_info = process.memory_info()
+    return mem_info.rss
+
+# decorator function
+def profile(func):
+    def wrapper(*args, **kwargs):
+
+        mem_before = process_memory()
+        result = func(*args, **kwargs)
+        mem_after = process_memory()
+        print("{}:consumed memory: {:,}".format(
+            func.__name__,
+            mem_before, mem_after, mem_after - mem_before))
+
+        return result
+    return wrapper
+
+# instantiation of decorator function
+@profile
 
 def main():
     clear_redis_store()
