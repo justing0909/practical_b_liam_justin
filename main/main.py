@@ -72,7 +72,7 @@ def update_config_files(config: Dict[str, Any]):
     vector_dims = {
         "nomic-embed-text": 768,
         "all-minilm": 384,
-        "snowflake-arctic-embed:137m": 768  # Update this if different
+        "snowflake-arctic-embed:137m": 768
     }
     vector_dim = vector_dims.get(config["embedding_model"], 384)
     

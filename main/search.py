@@ -12,8 +12,8 @@ import time
 # embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
 redis_client = redis.StrictRedis(host="localhost", port=6379, decode_responses=True)
 
-VECTOR_DIM = 384                    # TODO: change according to embedding model. To find this, type "np.array(embedding, dtype=np.float32).shape"
-                                    # at the debug point in the query_redis function. 768 for nomic, 384 for minilm, 
+VECTOR_DIM = 768                    # TODO: change according to embedding model. To find this, type "np.array(embedding, dtype=np.float32).shape"
+                                    # at the debug point in the query_redis function (line 126, print("")). 768 for nomic, 384 for minilm, 768 for snowflake-arctic-embed:137m
 INDEX_NAME = "embedding_index"
 DOC_PREFIX = "doc:"
 DISTANCE_METRIC = "COSINE"
