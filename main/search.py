@@ -12,7 +12,8 @@ import time
 # embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
 redis_client = redis.StrictRedis(host="localhost", port=6379, decode_responses=True)
 
-VECTOR_DIM = 768
+VECTOR_DIM = 384                    # TODO: change according to embedding model. To find this, type "np.array(embedding, dtype=np.float32).shape"
+                                    # at the debug point in the query_redis function. 768 for nomic, 384 for minilm, 
 INDEX_NAME = "embedding_index"
 DOC_PREFIX = "doc:"
 DISTANCE_METRIC = "COSINE"
@@ -22,24 +23,16 @@ DISTANCE_METRIC = "COSINE"
 #     return np.dot(vec1, vec2) / (np.linalg.norm(vec1) * np.linalg.norm(vec2))
 
 
-def get_embedding(text: str, model: str = "nomic-embed-text") -> list:  # TODO: chenge embedding models?
-
+def get_embedding(text: str, model: str = "all-minilm") -> list:  # TODO: change embedding model
     response = ollama.embeddings(model=model, prompt=text)
     return response["embedding"]
 
 
 def search_embeddings(query, top_k=3):
-
     query_embedding = get_embedding(query)
-
-    # Convert embedding to bytes for Redis search
     query_vector = np.array(query_embedding, dtype=np.float32).tobytes()
 
     try:
-        # Construct the vector similarity search query
-        # Use a more standard RediSearch vector search syntax
-        # q = Query("*").sort_by("embedding", query_vector)
-
         q = (
             Query("*=>[KNN 5 @embedding $vec AS vector_distance]")
             .sort_by("vector_distance")
@@ -47,12 +40,10 @@ def search_embeddings(query, top_k=3):
             .dialect(2)
         )
 
-        # Perform the search
         results = redis_client.ft(INDEX_NAME).search(
             q, query_params={"vec": query_vector}
         )
 
-        # Transform results into the expected format
         top_results = [
             {
                 "file": result.file,
@@ -66,7 +57,7 @@ def search_embeddings(query, top_k=3):
         # Print results for debugging
         for result in top_results:
             print(
-                f"---> File: {result['file']}, Page: {result['page']}, Chunk: {result['chunk']}"
+                f"---> File: {result['file']}, Page: {result['page']}, Text: {result['chunk']}"
             )
 
         return top_results
@@ -77,16 +68,14 @@ def search_embeddings(query, top_k=3):
 
 
 def generate_rag_response(query, context_results):
-
-    # Prepare context string
+    # Prepare context string using the 'chunk' key and 'similarity'
     context_str = "\n".join(
         [
-            f"From {result.get('file', 'Unknown file')} (page {result.get('page', 'Unknown page')}, chunk {result.get('chunk', 'Unknown chunk')}) "
+            f"From {result.get('file', 'Unknown file')} (page {result.get('page', 'Unknown page')}, text: {result.get('chunk', 'Unknown text')}) "
             f"with similarity {float(result.get('similarity', 0)):.2f}"
             for result in context_results
         ]
     )
-
     print(f"context_str: {context_str}")
 
     # Construct prompt with context
@@ -100,8 +89,6 @@ Context:
 Query: {query}
 
 Answer:"""
-    # "context" represents the three highest-similarity vector information
-
     # Generate response using Ollama
     response = ollama.chat(
         model="llama3.2:latest", messages=[{"role": "user", "content": prompt}]
@@ -131,6 +118,7 @@ def interactive_search():
 
         print("\n--- Response ---")
         print(response)
+        print("--------------------------------")
         print(f"TIME TO RUN: {(end_time - start_time):.4f} seconds")
 
 

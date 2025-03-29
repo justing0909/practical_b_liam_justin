@@ -12,7 +12,8 @@ import psutil
 # Initialize Redis connection
 redis_client = redis.Redis(host="localhost", port=6379, db=0)
 
-VECTOR_DIM = 768
+VECTOR_DIM = 384                    # TODO: change according to embedding model. To find this, type "np.array(embedding, dtype=np.float32).shape"
+                                    # at the debug point in the query_redis function. 768 for nomic, 384 for minilm, 
 INDEX_NAME = "embedding_index"
 DOC_PREFIX = "doc:"
 DISTANCE_METRIC = "COSINE"
@@ -43,7 +44,7 @@ def create_hnsw_index():
 
 
 # Generate an embedding using nomic-embed-text
-def get_embedding(text: str, model: str = "nomic-embed-text") -> list:
+def get_embedding(text: str, model: str = "all-minilm") -> list:
 
     response = ollama.embeddings(model=model, prompt=text)
     return response["embedding"]
@@ -58,12 +59,13 @@ def store_embedding(file: str, page: str, chunk: str, embedding: list):
             "file": file,
             "page": page,
             "chunk": chunk,
-            "embedding": np.array(
-                embedding, dtype=np.float32
-            ).tobytes(),  # Store as byte array
+            "embedding": np.array(embedding, dtype=np.float32).tobytes(),
         },
     )
     print(f"Stored embedding for: {chunk}")
+
+
+
 
 
 # extract the text from a PDF by page
@@ -114,18 +116,17 @@ def query_redis(query_text: str):
     q = (
         Query("*=>[KNN 5 @embedding $vec AS vector_distance]")
         .sort_by("vector_distance")
-        .return_fields("id", "vector_distance")
+        .return_fields("id", "vector_distance", "chunk")
         .dialect(2)
     )
-    query_text = "Efficient search in vector databases"
     embedding = get_embedding(query_text)
     res = redis_client.ft(INDEX_NAME).search(
         q, query_params={"vec": np.array(embedding, dtype=np.float32).tobytes()}
     )
-    # print(res.docs)
-
+    print("")
     for doc in res.docs:
-        print(f"{doc.id} \n ----> {doc.vector_distance}\n")
+        print(f"ID: {doc.id}\nText: {doc.chunk}\nDistance: {doc.vector_distance}\n")
+
 
 # inner psutil function
 def process_memory():
@@ -155,12 +156,13 @@ def main():
 
     start_time = time.perf_counter()
     create_hnsw_index()
-    process_pdfs("PDFs")
+    process_pdfs("main/PDFs")
     end_time = time.perf_counter()
 
     print("\n---Done processing PDFs---\n")
-    print(f"TIME TO RUN: {(end_time - start_time):.4f} seconds")
     query_redis("What is the capital of France?")
+    print("--------------------------------")
+    print(f"TIME TO RUN: {(end_time - start_time):.4f} seconds")
 
 
 if __name__ == "__main__":
