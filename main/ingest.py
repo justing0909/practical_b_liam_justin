@@ -12,8 +12,7 @@ import psutil
 # Initialize Redis connection
 redis_client = redis.Redis(host="localhost", port=6379, db=0)
 
-VECTOR_DIM = 768                    # TODO: change according to embedding model. To find this, type "np.array(embedding, dtype=np.float32).shape"
-                                    # at the debug point in the query_redis function (line 126, print("")). 768 for nomic, 384 for minilm, 768 for snowflake-arctic-embed:137m
+VECTOR_DIM = 768
 INDEX_NAME = "embedding_index"
 DOC_PREFIX = "doc:"
 DISTANCE_METRIC = "COSINE"

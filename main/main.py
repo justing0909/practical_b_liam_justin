@@ -139,13 +139,16 @@ def main():
     print("2. Run search.py to query your documents")
     
     while True:
-        choice = input("\nWhat would you like to do? (1: Ingest, 2: Search, q: Quit): ")
+        choice = input("\nWhat would you like to do? (1: Ingest, 2: Search, c: Change Parameters, q: Quit): ")
         if choice.lower() == "q":
             break
         elif choice == "1":
             subprocess.run([sys.executable, "main/ingest.py"])
         elif choice == "2":
             subprocess.run([sys.executable, "main/search.py"])
+        elif choice.lower() == "c":
+            config = configure_environment()
+            update_config_files(config)
         else:
             print("Invalid choice. Please try again.")
 

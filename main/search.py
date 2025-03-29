@@ -12,8 +12,7 @@ import time
 # embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
 redis_client = redis.StrictRedis(host="localhost", port=6379, decode_responses=True)
 
-VECTOR_DIM = 768                    # TODO: change according to embedding model. To find this, type "np.array(embedding, dtype=np.float32).shape"
-                                    # at the debug point in the query_redis function (line 126, print("")). 768 for nomic, 384 for minilm, 768 for snowflake-arctic-embed:137m
+VECTOR_DIM = 768
 INDEX_NAME = "embedding_index"
 DOC_PREFIX = "doc:"
 DISTANCE_METRIC = "COSINE"
@@ -91,7 +90,7 @@ Query: {query}
 Answer:"""
     # Generate response using Ollama
     response = ollama.chat(
-        model="llama3.2:latest", messages=[{"role": "user", "content": prompt}]
+        model="gemma:2b", messages=[{"role": "user", "content": prompt}]
     )   # TODO: change model here
 
     return response["message"]["content"]
