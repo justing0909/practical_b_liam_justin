@@ -31,7 +31,7 @@ def configure_environment() -> Dict[str, Any]:
     embedding_options = {
         "A": "nomic-embed-text",
         "B": "all-minilm",
-        "C": "snowflake-arctic-embed"
+        "C": "snowflake-arctic-embed:137m"
     }
     config["embedding_model"] = get_user_choice("Select embedding model:", embedding_options)
     
@@ -72,7 +72,7 @@ def update_config_files(config: Dict[str, Any]):
     vector_dims = {
         "nomic-embed-text": 768,
         "all-minilm": 384,
-        "snowflake-arctic-embed": 768  # Update this if different
+        "snowflake-arctic-embed:137m": 768  # Update this if different
     }
     vector_dim = vector_dims.get(config["embedding_model"], 384)
     

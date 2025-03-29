@@ -23,7 +23,7 @@ DISTANCE_METRIC = "COSINE"
 #     return np.dot(vec1, vec2) / (np.linalg.norm(vec1) * np.linalg.norm(vec2))
 
 
-def get_embedding(text: str, model: str = "all-minilm") -> list:  # TODO: change embedding model
+def get_embedding(text: str, model: str = "snowflake-arctic-embed:137m") -> list:  # TODO: change embedding model
     response = ollama.embeddings(model=model, prompt=text)
     return response["embedding"]
 

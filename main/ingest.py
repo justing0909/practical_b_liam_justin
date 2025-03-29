@@ -44,8 +44,7 @@ def create_hnsw_index():
 
 
 # Generate an embedding using nomic-embed-text
-def get_embedding(text: str, model: str = "all-minilm") -> list:
-
+def get_embedding(text: str, model: str = "snowflake-arctic-embed:137m") -> list:
     response = ollama.embeddings(model=model, prompt=text)
     return response["embedding"]
 
@@ -63,9 +62,6 @@ def store_embedding(file: str, page: str, chunk: str, embedding: list):
         },
     )
     print(f"Stored embedding for: {chunk}")
-
-
-
 
 
 # extract the text from a PDF by page
