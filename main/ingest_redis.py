@@ -43,7 +43,7 @@ def create_hnsw_index():
 
 
 # Generate an embedding using nomic-embed-text
-def get_embedding(text: str, model: str = "snowflake-arctic-embed:137m") -> list:
+def get_embedding(text: str, model: str = "nomic-embed-text") -> list:
     response = ollama.embeddings(model=model, prompt=text)
     return response["embedding"]
 
