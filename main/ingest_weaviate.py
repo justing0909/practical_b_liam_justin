@@ -1,4 +1,5 @@
 import weaviate
+from weaviate.connect import ConnectionParams  # Correct import
 import os
 import numpy as np
 import pymupdf
@@ -6,8 +7,22 @@ import time
 import psutil
 import ollama
 
+# Set up the connection parameters
+connection_params = ConnectionParams(
+    http={
+        "host": "localhost",        # Host for HTTP connection
+        "port": 8080,               # Port for HTTP connection
+        "secure": False             # Whether the HTTP connection is secure (True for HTTPS)
+    },
+    grpc={
+        "host": "localhost",        # Host for GRPC connection
+        "port": 50051,              # Port for GRPC connection
+        "secure": False             # Whether the GRPC connection is secure (True for gRPC with SSL)
+    }
+)
+
 # Initialize Weaviate client (v4)
-client = weaviate.Client("http://localhost:8080")  # Directly pass the Weaviate instance URL
+client = weaviate.WeaviateClient(connection_params)
 
 VECTOR_DIM = 768
 CLASS_NAME = "Document"
