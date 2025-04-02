@@ -37,9 +37,9 @@ def configure_environment() -> Dict[str, Any]:
     
     # Database selection
     db_options = {
-        "A": "redis-stack",
+        "A": "redis",
         "B": "chroma",
-        "C": "undecided"
+        "C": "qdrant"
     }
     config["database"] = get_user_choice("Select database:", db_options)
     
@@ -62,9 +62,9 @@ def configure_environment() -> Dict[str, Any]:
     return config
 
 def update_config_files(config: Dict[str, Any]):
-    """Update the configuration in ingest.py and search.py based on user choices."""
-    # Update ingest.py
-    ingest_path = os.path.join(os.path.dirname(__file__), "ingest.py")
+    """Update the configuration in the database-specific ingest and search files."""
+    # Update ingest file
+    ingest_path = os.path.join(os.path.dirname(__file__), f"ingest_{config['database']}.py")
     with open(ingest_path, "r") as f:
         ingest_content = f.read()
     
@@ -97,8 +97,8 @@ def update_config_files(config: Dict[str, Any]):
     with open(ingest_path, "w") as f:
         f.write(ingest_content)
     
-    # Update search.py
-    search_path = os.path.join(os.path.dirname(__file__), "search.py")
+    # Update search file
+    search_path = os.path.join(os.path.dirname(__file__), f"search_{config['database']}.py")
     with open(search_path, "r") as f:
         search_content = f.read()
     
@@ -135,17 +135,17 @@ def main():
     update_config_files(config)
     
     print("\nConfiguration complete! You can now:")
-    print("1. Run ingest.py to process your PDFs")
-    print("2. Run search.py to query your documents")
+    print(f"1. Run ingest_{config['database']}.py to process your PDFs")
+    print(f"2. Run search_{config['database']}.py to query your documents")
     
     while True:
         choice = input("\nWhat would you like to do? (1: Ingest, 2: Search, c: Change Parameters, q: Quit): ")
         if choice.lower() == "q":
             break
         elif choice == "1":
-            subprocess.run([sys.executable, "main/ingest.py"])
+            subprocess.run([sys.executable, f"main/ingest_{config['database']}.py"])
         elif choice == "2":
-            subprocess.run([sys.executable, "main/search.py"])
+            subprocess.run([sys.executable, f"main/search_{config['database']}.py"])
         elif choice.lower() == "c":
             config = configure_environment()
             update_config_files(config)
