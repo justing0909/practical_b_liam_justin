@@ -104,7 +104,7 @@ def update_config_files(config: Dict[str, Any]):
     
     # Update search file
     search_path = os.path.join(os.path.dirname(__file__), f"search_{config['database']}.py")
-    with open(search_path, "r") as f:
+    with open(search_path, "w",encoding="utf-8") as f:
         search_content = f.read()
     
     # Update VECTOR_DIM
