@@ -16,7 +16,7 @@ VECTOR_DIM = 768
 INDEX_NAME = "embedding_index"
 
 # Function to get embedding using ollama
-def get_embedding(text: str, model: str = "snowflake-arctic-embed:137m") -> list:
+def get_embedding(text: str, model: str = "nomic-embed-text") -> list:
     response = ollama.embeddings(model=model, prompt=text)
     return response["embedding"]
 
@@ -87,7 +87,7 @@ Answer:"""
     try:
         # Generate response using Ollama
         response = ollama.chat(
-            model="llama3.2", messages=[{"role": "user", "content": prompt}]
+            model="gemma:2b", messages=[{"role": "user", "content": prompt}]
         )  # TODO: Change model here
 
         return response["message"]["content"]
