@@ -45,17 +45,22 @@ def configure_environment() -> Dict[str, Any]:
     
     # Chunk size selection
     chunk_options = {
-        "A": "300",
-        "B": "undecided",
-        "C": "undecided"
+        "A": "200",
+        "B": "250",
+        "C": "300",
+        "D": "350",
+        "E": "400"
     }
     config["chunk_size"] = int(get_user_choice("Select chunk size:", chunk_options))
     
     # Overlap selection
     overlap_options = {
-        "A": "50",
-        "B": "undecided",
-        "C": "undecided"
+        "A": "10",
+        "B": "30",
+        "C": "40",
+        "D": "50",
+        "E": "60",
+        "F": "70"
     }
     config["overlap"] = int(get_user_choice("Select overlap:", overlap_options))
     
