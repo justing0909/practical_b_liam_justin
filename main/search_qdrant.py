@@ -24,7 +24,7 @@ def initialize_qdrant():
 initialize_qdrant()
 
 
-def get_embedding(text: str, model: str = "snowflake-arctic-embed:137m") -> list:
+def get_embedding(text: str, model: str = "nomic-embed-text") -> list:
     """Generate embeddings using Ollama."""
     response = ollama.embeddings(model=model, prompt=text)
     return response["embedding"]
